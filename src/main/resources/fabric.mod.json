@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "egoistical",
+	"version": "${version}",
+	"name": "Egoistical",
+	"description": "Ego's Shenanigans, a mod where I add items to hunt people down",
+	"authors": [
+		"VainnGlory"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "ARR",
+	"icon": "assets/egoistical/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.vainnglory.egoistical.Egoistical"
+		],
+      "client": [
+        "net.vainnglory.egoistical.EgoisticalClient"
+      ],
+      "emi": [
+        "net.vainnglory.egoistical.compat.EgoisticalEmiPlugin"
+      ],
+		"fabric-datagen": [
+			"net.vainnglory.egoistical.EgoisticalDataGenerator"
+		]
+	},
+	"mixins": [
+		"egoistical.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.2",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	}
+}

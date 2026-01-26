@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "A#A",
+    "#S#",
+    "A#A"
+  ],
+  "key": {
+    "#": {
+      "tag": "minecraft:gold_ingot"
+    },
+    "A": {
+      "tag": "minecraft:netherite_scrap"
+    },
+    "S": {
+      "item": "minecraft:gold_nugget"
+    }
+  },
+  "result": {
+    "item": "egoistical:greed_rune"
+  }
+}
