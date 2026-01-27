@@ -8,7 +8,7 @@
   ],
   "key": {
     "#": {
-      "tag": "minecraft:gold_block"
+      "item": "minecraft:gold_block"
     },
     "S": {
       "item": "minecraft:nether_star"

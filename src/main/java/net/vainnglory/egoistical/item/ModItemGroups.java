@@ -8,6 +8,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.vainnglory.egoistical.Egoistical;
 
+
 public class ModItemGroups {
     public static final ItemGroup EGO = Registry.register(Registries.ITEM_GROUP,
             new Identifier(Egoistical.MOD_ID, "ego"),
@@ -15,6 +16,8 @@ public class ModItemGroups {
                     .icon(() -> new ItemStack(ModItems.TRACKER)).entries((displayContext, entries) -> {
                         entries.add(ModItems.TRACKER);
                         entries.add(ModItems.GREED_RUNE);
+                        entries.add(ModItems.ADRENALINE_SHOT_EMPTY);
+                        entries.add(ModItems.ADRENALINE_SHOT_FILLED);
 
 
                     }).build());

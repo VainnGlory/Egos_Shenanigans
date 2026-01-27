@@ -2,22 +2,19 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "A#A",
-    "#S#",
-    "A#A"
+    "###",
+    "A A",
+    " A "
   ],
   "key": {
     "#": {
       "item": "minecraft:gold_ingot"
     },
     "A": {
-      "item": "minecraft:netherite_scrap"
-    },
-    "S": {
-      "item": "minecraft:gold_nugget"
+      "item": "minecraft:glass"
     }
   },
   "result": {
-    "item": "egoistical:greed_rune"
+    "item": "egoistical:adrenaline_shot_empty"
   }
 }

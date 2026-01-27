@@ -1,5 +1,6 @@
 package net.vainnglory.egoistical.item;
 
+import net.minecraft.item.PotionItem;
 import net.vainnglory.egoistical.Egoistical;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -17,6 +18,13 @@ public class ModItems {
     public static final TrackerItem TRACKER = (TrackerItem) registerItem("tracker",
             new TrackerItem(new FabricItemSettings().maxCount(1).rarity(Rarity.RARE)));
 
+    public static final AdrenalineShotItem ADRENALINE_SHOT_EMPTY = (AdrenalineShotItem) registerItem("adrenaline_shot_empty",
+            new AdrenalineShotItem(new FabricItemSettings().maxCount(16).rarity(Rarity.UNCOMMON), false));
+
+    public static final AdrenalineShotItem ADRENALINE_SHOT_FILLED = (AdrenalineShotItem) registerItem("adrenaline_shot_filled",
+            new AdrenalineShotItem (new FabricItemSettings().maxCount(1).rarity(Rarity.RARE), true));
+
+
     private static Item registerItem(String name, Item item) {
         return Registry.register(Registries.ITEM, new Identifier(Egoistical.MOD_ID, name), item);
     }
@@ -26,6 +34,11 @@ public class ModItems {
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
             content.add(GREED_RUNE);
+            content.add(TRACKER);
+        });
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
+            content.add(ADRENALINE_SHOT_EMPTY);
+            content.add(ADRENALINE_SHOT_FILLED);
         });
     }
 }

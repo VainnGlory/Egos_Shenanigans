@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " # ",
+    "ASA",
+    " # "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:blaze_powder"
+    },
+    "A": {
+      "item": "minecraft:ghast_tear"
+    },
+    "S": {
+      "item": "egoistical:adrenaline_shot_empty"
+    }
+  },
+  "result": {
+    "item": "egoistical:adrenaline_shot_filled"
+  }
+}

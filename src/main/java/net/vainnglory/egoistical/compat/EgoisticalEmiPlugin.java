@@ -11,5 +11,7 @@ public class EgoisticalEmiPlugin implements EmiPlugin {
     public void register(EmiRegistry registry) {
         registry.removeEmiStacks(EmiStack.of(ModItems.GREED_RUNE));
         registry.removeEmiStacks(EmiStack.of(ModItems.TRACKER));
+        registry.removeEmiStacks(EmiStack.of(ModItems.ADRENALINE_SHOT_EMPTY));
+        registry.removeEmiStacks(EmiStack.of(ModItems.ADRENALINE_SHOT_FILLED));
     }
 }

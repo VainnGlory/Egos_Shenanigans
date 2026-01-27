@@ -1,6 +1,8 @@
 {
   "item.egoistical.greed_rune": "Rune of Greed",
   "item.egoistical.tracker": "Player Tracker",
-
+  "item.egoistical.adrenaline_shot_empty": "Empty Adrenaline Shot",
+  "item.egoistical.adrenaline_shot_filled": "Adrenaline Shot",
+  "effect.egoistical.adrenaline": "Adrenaline",
   "itemgroup.ego": "Ego's Shenanigans"
 }
