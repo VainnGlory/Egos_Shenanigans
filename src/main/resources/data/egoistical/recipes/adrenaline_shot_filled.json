@@ -4,14 +4,14 @@
   "pattern": [
     " # ",
     "ASA",
-    " # "
+    "   "
   ],
   "key": {
     "#": {
       "item": "minecraft:blaze_powder"
     },
     "A": {
-      "item": "minecraft:ghast_tear"
+      "item": "minecraft:red_dye"
     },
     "S": {
       "item": "egoistical:adrenaline_shot_empty"

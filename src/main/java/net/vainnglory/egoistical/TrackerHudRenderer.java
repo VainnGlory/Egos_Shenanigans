@@ -42,7 +42,7 @@ public class TrackerHudRenderer implements HudRenderCallback {
         String trackedName = TrackerItem.getTrackedPlayerName(trackerStack);
 
         if (trackedUUID == null || trackedName == null) {
-            renderText(drawContext, client, "Tracker: No target", 0xFFFF00);
+            renderText(drawContext, client, "Tracker: No target", 0xF5C271);
             return;
         }
 
@@ -58,9 +58,9 @@ public class TrackerHudRenderer implements HudRenderCallback {
             BlockPos pos = trackedPlayer.getBlockPos();
             int distance = (int) Math.sqrt(player.squaredDistanceTo(trackedPlayer));
 
-            renderText(drawContext, client, "Tracking: " + trackedName, 0x00FF00);
+            renderText(drawContext, client, "Tracking: " + trackedName, 0xF571AF);
             renderText(drawContext, client, String.format("X: %d  Y: %d  Z: %d", pos.getX(), pos.getY(), pos.getZ()), 0xFFFFFF, 10);
-            renderText(drawContext, client, "Distance: " + distance + "m", 0xAAAAFF, 20);
+            renderText(drawContext, client, "Distance: " + distance + "m", 0xF5C271, 20);
         } else {
             TrackerNetworking.TrackedPlayerData cachedData = TrackerNetworking.getTrackedPosition(trackedUUID);
 
@@ -73,17 +73,17 @@ public class TrackerHudRenderer implements HudRenderCallback {
                 boolean sameDimension = currentDimension.equals(cachedData.dimension);
 
                 if (sameDimension) {
-                    renderText(drawContext, client, "Tracking: " + trackedName, 0xFFAA00);
+                    renderText(drawContext, client, "Tracking: " + trackedName, 0xF571AF);
                     renderText(drawContext, client, String.format("X: %d  Y: %d  Z: %d", pos.getX(), pos.getY(), pos.getZ()), 0xFFFFFF, 10);
-                    renderText(drawContext, client, "Distance: ~" + distance + "m (Far)", 0xFFAA00, 20);
+                    renderText(drawContext, client, "Distance: ~" + distance + "m (Far)", 0xF5C271, 20);
                 } else {
-                    renderText(drawContext, client, "Tracking: " + trackedName, 0xFFAA00);
-                    renderText(drawContext, client, "Status: Different Dimension", 0xFF5555, 10);
+                    renderText(drawContext, client, "Tracking: " + trackedName, 0xF571AF);
+                    renderText(drawContext, client, "Status: Different Dimension", 0xDEB983, 10);
                     renderText(drawContext, client, "Last known: " + cachedData.dimension, 0xAAAAAA, 20);
                 }
             } else {
-                renderText(drawContext, client, "Tracking: " + trackedName, 0xFF5555);
-                renderText(drawContext, client, "Status: Offline", 0xFF5555, 10);
+                renderText(drawContext, client, "Tracking: " + trackedName, 0xF571AF);
+                renderText(drawContext, client, "Status: Offline", 0xF571AF, 10);
             }
         }
     }

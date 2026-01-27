@@ -2,12 +2,15 @@ package net.vainnglory.egoistical;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.item.ModelPredicateProviderRegistry;
+import net.minecraft.util.Identifier;
 import net.vainnglory.egoistical.item.ModItems;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.vainnglory.egoistical.item.TrackerItem;
 import net.vainnglory.egoistical.network.TrackerNetworking;
 
 import java.util.HashSet;
@@ -20,6 +23,13 @@ public class EgoisticalClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ModelPredicateProviderRegistry.register(
+                ModItems.TRACKER,
+                new Identifier("egoistical", "tracking"),
+                (stack, world, entity, seed) -> {
+                    return TrackerItem.hasTrackedPlayer(stack) ? 1.0f : 0.0f;
+                }
+        );
         TrackerNetworking.registerClientPacketReceiver();
 
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {

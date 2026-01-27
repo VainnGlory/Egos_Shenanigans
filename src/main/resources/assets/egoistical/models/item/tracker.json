@@ -2,5 +2,13 @@
   "parent": "item/generated",
   "textures": {
     "layer0": "egoistical:item/tracker"
-  }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "egoistical:tracking": 1
+      },
+      "model": "egoistical:item/tracker_active"
+    }
+  ]
 }
