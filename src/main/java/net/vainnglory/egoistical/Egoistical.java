@@ -13,6 +13,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.vainnglory.egoistical.item.TrackerItem;
 import net.vainnglory.egoistical.network.TrackerNetworking;
 import net.vainnglory.egoistical.util.AdrenalineManager;
+import net.vainnglory.egoistical.util.InventoryHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,20 +42,26 @@ public class Egoistical implements ModInitializer {
         ModItemGroups.registerItemGroups();
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
+            trackerUpdateTick++;
+            boolean shouldUpdateTrackers = false;
+            if (trackerUpdateTick >= TRACKER_UPDATE_INTERVAL) {
+                trackerUpdateTick = 0;
+                shouldUpdateTrackers = true;
+            }
+
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 if (hasGreedRune(player)) {
                     handleGreedRuneEffects(player);
                 }
 
-                trackerUpdateTick++;
-                if (trackerUpdateTick >= TRACKER_UPDATE_INTERVAL) {
-                    trackerUpdateTick = 0;
+                if (shouldUpdateTrackers) {
                     handleTrackerUpdates(player, server);
                 }
 
                 handleAdrenalineEffectTracking(player);
             }
         });
+
 
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             UUID uuid = newPlayer.getUuid();
@@ -106,7 +113,7 @@ public class Egoistical implements ModInitializer {
     }
 
     private boolean hasGreedRune(ServerPlayerEntity player) {
-        return player.getInventory().contains(ModItems.GREED_RUNE.getDefaultStack());
+        return InventoryHelper.hasItem(player, ModItems.GREED_RUNE);
     }
 
     private void handleGreedRuneEffects(ServerPlayerEntity player) {

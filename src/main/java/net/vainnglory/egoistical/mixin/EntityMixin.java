@@ -1,11 +1,12 @@
 package net.vainnglory.egoistical.mixin;
 
-import net.minecraft.block.BlockState;
-import net.vainnglory.egoistical.EgoisticalClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.vainnglory.egoistical.item.ModItems;
+import net.vainnglory.egoistical.util.InventoryHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,7 +22,7 @@ public abstract class EntityMixin {
     private void cancelStepSound(BlockPos pos, BlockState state, CallbackInfo ci) {
         Entity entity = (Entity) (Object) this;
         if (entity instanceof PlayerEntity player) {
-            if (EgoisticalClient.shouldCancelStepSound(player)) {
+            if (InventoryHelper.hasItem(player, ModItems.GREED_RUNE)) {
                 ci.cancel();
             }
         }

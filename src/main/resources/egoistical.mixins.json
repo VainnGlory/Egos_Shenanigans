@@ -3,7 +3,6 @@
   "package": "net.vainnglory.egoistical.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "EntityMixin",
     "ExampleMixin",
     "LivingEntityDamageMixin",
     "PlayerEntityMixin"
@@ -15,6 +14,8 @@
     "requireAnnotations": true
   },
   "client": [
-    "EntityRendererMixin"
+    "EntityMixin",
+    "EntityRendererMixin",
+    "EntityGlowMixin"
   ]
 }
