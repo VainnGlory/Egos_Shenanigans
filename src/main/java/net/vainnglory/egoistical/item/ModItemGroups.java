@@ -18,7 +18,7 @@ public class ModItemGroups {
                         entries.add(ModItems.GREED_RUNE);
                         entries.add(ModItems.ADRENALINE_SHOT_EMPTY);
                         entries.add(ModItems.ADRENALINE_SHOT_FILLED);
-
+                        entries.add(ModItems.PORTABLE_STASIS);
 
                     }).build());
 

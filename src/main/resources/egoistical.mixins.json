@@ -5,7 +5,9 @@
   "mixins": [
     "ExampleMixin",
     "LivingEntityDamageMixin",
-    "PlayerEntityMixin"
+    "PlayerEntityMixin",
+    ,
+    "ScreenHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -14,8 +16,8 @@
     "requireAnnotations": true
   },
   "client": [
+    "EntityGlowMixin",
     "EntityMixin",
-    "EntityRendererMixin",
-    "EntityGlowMixin"
+    "EntityRendererMixin"
   ]
 }

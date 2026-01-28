@@ -1,30 +1,41 @@
 package net.vainnglory.egoistical.item;
 
-import net.minecraft.item.Item;
-import net.vainnglory.egoistical.effect.ModEffects;
-import net.vainnglory.egoistical.util.AdrenalineManager;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.text.Style;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.minecraft.text.Text;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.world.World;
+import net.vainnglory.egoistical.effect.ModEffects;
+import net.vainnglory.egoistical.util.AdrenalineManager;
+import net.vainnglory.egoistical.util.ModRarities;
 
 public class AdrenalineShotItem extends Item {
     private final boolean filled;
+    private final ModRarities rarity;
 
 
-    public AdrenalineShotItem(Settings settings, boolean filled) {
+    public AdrenalineShotItem(Settings settings, ModRarities rarity, boolean filled) {
         super(settings);
         this.filled = filled;
+        this.rarity = rarity;
+    }
+
+    @Override
+    public Text getName(ItemStack stack) {
+        Text baseName = super.getName(stack);
+
+        return baseName.copy().setStyle(Style.EMPTY.withColor(rarity.color));
     }
 
     @Override
@@ -45,7 +56,7 @@ public class AdrenalineShotItem extends Item {
             return TypedActionResult.success(emptyShot);
         }
 
-        return TypedActionResult.success(stack, world.isClient);
+        return TypedActionResult.consume(stack);
     }
 
     @Override
@@ -57,20 +68,28 @@ public class AdrenalineShotItem extends Item {
             return ActionResult.FAIL;
         }
 
-        if (!user.getWorld().isClient && entity instanceof ServerPlayerEntity target && user instanceof ServerPlayerEntity serverUser) {
+        if (user.getWorld().isClient) {
+            return ActionResult.PASS;
+        }
+
+        if (entity instanceof ServerPlayerEntity target && user instanceof ServerPlayerEntity serverUser) {
             applyAdrenalineEffect(serverUser, target);
 
-            stack.decrement(1);
+            ItemStack heldStack = user.getStackInHand(hand);
+            heldStack.decrement(1);
 
             ItemStack emptyShot = new ItemStack(ModItems.ADRENALINE_SHOT_EMPTY);
             if (!user.getInventory().insertStack(emptyShot)) {
                 user.dropItem(emptyShot, false);
             }
 
+            serverUser.getInventory().markDirty();
+            serverUser.playerScreenHandler.sendContentUpdates();
+
             return ActionResult.SUCCESS;
         }
 
-        return user.getWorld().isClient ? ActionResult.SUCCESS : ActionResult.PASS;
+        return ActionResult.PASS;
     }
 
     private void applyAdrenalineEffect(ServerPlayerEntity user, LivingEntity target) {
@@ -80,10 +99,10 @@ public class AdrenalineShotItem extends Item {
 
         target.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 600, 1, false, false, true));
 
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 600, 0, false, false, true));
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 600, 0, false, false, true));
 
         target.getWorld().playSound(null, target.getX(), target.getY(), target.getZ(),
-                SoundEvents.ITEM_BOTTLE_FILL, SoundCategory.PLAYERS, 1.0f, 1.0f);
+                SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
         if (target instanceof ServerPlayerEntity targetPlayer) {
             if (target.equals(user)) {

@@ -1,0 +1,14 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "egoistical:item/portable_stasis"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "egoistical:charged": 1
+      },
+      "model": "egoistical:item/portable_stasis_charged"
+    }
+  ]
+}

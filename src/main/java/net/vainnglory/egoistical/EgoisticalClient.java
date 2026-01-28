@@ -7,6 +7,7 @@ import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.vainnglory.egoistical.item.ModItems;
+import net.vainnglory.egoistical.item.PortableStasisItem;
 import net.vainnglory.egoistical.item.TrackerItem;
 import net.vainnglory.egoistical.network.TrackerNetworking;
 import net.vainnglory.egoistical.util.InventoryHelper;
@@ -23,6 +24,14 @@ public class EgoisticalClient implements ClientModInitializer {
                 }
         );
 
+        ModelPredicateProviderRegistry.register(
+                ModItems.PORTABLE_STASIS,
+                new Identifier("egoistical", "charged"),
+                (stack, world, entity, seed) -> {
+                    return PortableStasisItem.isFullyCharged(stack) ? 1.0f : 0.0f;
+                }
+        );
+
         TrackerNetworking.registerClientPacketReceiver();
 
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
@@ -30,7 +39,6 @@ public class EgoisticalClient implements ClientModInitializer {
         });
 
         HudRenderCallback.EVENT.register(new TrackerHudRenderer());
-
     }
 
     public static boolean shouldCancelStepSound(PlayerEntity player) {

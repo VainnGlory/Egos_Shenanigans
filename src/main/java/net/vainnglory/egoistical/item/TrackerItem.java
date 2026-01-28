@@ -1,6 +1,8 @@
 package net.vainnglory.egoistical.item;
 
 import java.util.UUID;
+
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
@@ -11,14 +13,25 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.vainnglory.egoistical.util.ModRarities;
 
 public class TrackerItem extends Item {
     private static final String TRACKED_UUID_KEY = "TrackedPlayerUUID";
     private static final String TRACKED_NAME_KEY = "TrackedPlayerName";
+    private final ModRarities rarity;
 
-    public TrackerItem(Settings settings) {
+    public TrackerItem(Settings settings, ModRarities rarity) {
         super(settings);
+        this.rarity = rarity;
     }
+
+    @Override
+    public Text getName(ItemStack stack) {
+        Text baseName = super.getName(stack);
+
+        return baseName.copy().setStyle(Style.EMPTY.withColor(rarity.color));
+    }
+
 
     @Override
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
