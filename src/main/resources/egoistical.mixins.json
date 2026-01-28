@@ -6,7 +6,6 @@
     "ExampleMixin",
     "LivingEntityDamageMixin",
     "PlayerEntityMixin",
-    ,
     "ScreenHandlerMixin"
   ],
   "injectors": {
