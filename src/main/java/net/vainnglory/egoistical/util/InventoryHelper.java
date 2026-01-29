@@ -6,7 +6,6 @@ import net.minecraft.item.ItemStack;
 
 public class InventoryHelper {
 
-
     public static boolean hasItem(PlayerEntity player, Item item) {
         for (int i = 0; i < player.getInventory().size(); i++) {
             ItemStack stack = player.getInventory().getStack(i);

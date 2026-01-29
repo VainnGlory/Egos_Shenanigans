@@ -1,17 +1,19 @@
 package net.vainnglory.egoistical;
 
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.minecraft.item.ItemStack;
 import net.vainnglory.egoistical.effect.ModEffects;
 import net.vainnglory.egoistical.item.ModItemGroups;
 import net.vainnglory.egoistical.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.vainnglory.egoistical.item.TrackerItem;
 import net.vainnglory.egoistical.network.TrackerNetworking;
+import net.vainnglory.egoistical.util.ModRecipes;
 import net.vainnglory.egoistical.util.AdrenalineManager;
 import net.vainnglory.egoistical.util.InventoryHelper;
 import org.slf4j.Logger;
@@ -30,6 +32,9 @@ public class Egoistical implements ModInitializer {
     private static final int TRACKER_UPDATE_INTERVAL = 10;
     private static final Set<UUID> playersWithAdrenaline = new HashSet<>();
 
+    private int thornedIngotTick = 0;
+    private static final int THORNED_INGOT_DAMAGE_INTERVAL = 4;
+
     @Override
     public void onInitialize() {
         LOGGER.info("Initializing Egoistical Mod");
@@ -41,17 +46,34 @@ public class Egoistical implements ModInitializer {
         LOGGER.info("Registered mod items");
         ModItemGroups.registerItemGroups();
 
+        ModRecipes.registerRecipes();
+        LOGGER.info("Registered mod recipes");
+
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             trackerUpdateTick++;
+            thornedIngotTick++;
+
             boolean shouldUpdateTrackers = false;
             if (trackerUpdateTick >= TRACKER_UPDATE_INTERVAL) {
                 trackerUpdateTick = 0;
                 shouldUpdateTrackers = true;
             }
 
+            boolean shouldDamageThornedIngot = false;
+            if (thornedIngotTick >= THORNED_INGOT_DAMAGE_INTERVAL) {
+                thornedIngotTick = 0;
+                shouldDamageThornedIngot = true;
+            }
+
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 if (hasGreedRune(player)) {
                     handleGreedRuneEffects(player);
+                }
+
+                if (hasThornedIngot(player)) {
+                    if (shouldDamageThornedIngot) {
+                        handleThornedIngotDamage(player);
+                    }
                 }
 
                 if (shouldUpdateTrackers) {
@@ -71,6 +93,28 @@ public class Egoistical implements ModInitializer {
         });
 
         LOGGER.info("Egoistical Mod initialized successfully");
+    }
+
+    private void handleThornedIngotDamage(ServerPlayerEntity player) {
+        if (player.isCreative() || player.isSpectator()) {
+            return;
+        }
+
+        ItemStack mainHand = player.getMainHandStack();
+        ItemStack offHand = player.getOffHandStack();
+
+        boolean isHeld = mainHand.isOf(ModItems.THORNED_INGOT) || offHand.isOf(ModItems.THORNED_INGOT);
+
+        float damage = isHeld ? 1.0f : 0.5f;
+
+        float newHealth = player.getHealth() - damage;
+
+        if (newHealth <= 0) {
+            DamageSource magicDamage = player.getDamageSources().magic();
+            player.damage(magicDamage, damage);
+        } else {
+            player.setHealth(newHealth);
+        }
     }
 
     private void handleAdrenalineEffectTracking(ServerPlayerEntity player) {
@@ -116,6 +160,10 @@ public class Egoistical implements ModInitializer {
         return InventoryHelper.hasItem(player, ModItems.GREED_RUNE);
     }
 
+    private boolean hasThornedIngot(ServerPlayerEntity player) {
+        return InventoryHelper.hasItem(player, ModItems.THORNED_INGOT);
+    }
+
     private void handleGreedRuneEffects(ServerPlayerEntity player) {
         float healthPercentage = player.getHealth() / player.getMaxHealth();
         boolean isLowHealth = healthPercentage <= LOW_HEALTH_THRESHOLD;
@@ -146,9 +194,9 @@ public class Egoistical implements ModInitializer {
             }
         }
 
-        if (player.isTouchingWater() || player.isSubmergedInWater()) {
-            if (player.hasStatusEffect(StatusEffects.REGENERATION)) {
-                player.removeStatusEffect(StatusEffects.REGENERATION);
+        if (player.isSneaking() || player.isCrawling()) {
+            if (player.hasStatusEffect(StatusEffects.SLOWNESS)) {
+                player.removeStatusEffect(StatusEffects.SLOWNESS);
             }
         }
     }

@@ -28,6 +28,9 @@ public class ModItems {
     public static final PortableStasisItem PORTABLE_STASIS = (PortableStasisItem) registerItem("portable_stasis",
             new PortableStasisItem(new FabricItemSettings().maxCount(1), ModRarities.ENDER));
 
+    public static final ThornedIngotItem THORNED_INGOT = (ThornedIngotItem) registerItem("thorned_ingot",
+            new ThornedIngotItem(new FabricItemSettings().maxCount(64), ModRarities.GOLDEN));
+
 
 
     private static Item registerItem(String name, Item item) {
@@ -44,6 +47,9 @@ public class ModItems {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
             content.add(ADRENALINE_SHOT_EMPTY);
             content.add(ADRENALINE_SHOT_FILLED);
+        });
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(content -> {
+            content.add(THORNED_INGOT);
         });
     }
 }
