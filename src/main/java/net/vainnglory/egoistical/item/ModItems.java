@@ -31,6 +31,10 @@ public class ModItems {
     public static final ThornedIngotItem THORNED_INGOT = (ThornedIngotItem) registerItem("thorned_ingot",
             new ThornedIngotItem(new FabricItemSettings().maxCount(64), ModRarities.GOLDEN));
 
+    public static final TrickBagItem TRICK_BAG = (TrickBagItem) registerItem("trick_bag",
+            new TrickBagItem(new FabricItemSettings().maxCount(1), ModRarities.GOLDEN));
+
+
 
 
     private static Item registerItem(String name, Item item) {
@@ -43,6 +47,7 @@ public class ModItems {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
             content.add(GREED_RUNE);
             content.add(TRACKER);
+            content.add(TRICK_BAG);
         });
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
             content.add(ADRENALINE_SHOT_EMPTY);

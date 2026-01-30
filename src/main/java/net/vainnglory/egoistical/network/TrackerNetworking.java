@@ -14,8 +14,10 @@ import java.util.UUID;
 
 public class TrackerNetworking {
     public static final Identifier TRACKER_UPDATE_PACKET = new Identifier("egoistical", "tracker_update");
+    public static final Identifier BEING_WATCHED_PACKET = new Identifier("egoistical", "being_watched");
 
     private static final Map<UUID, TrackedPlayerData> trackedPositions = new HashMap<>();
+    private static boolean isBeingWatched = false;
 
     public static void registerClientPacketReceiver() {
         ClientPlayNetworking.registerGlobalReceiver(TRACKER_UPDATE_PACKET, (client, handler, buf, responseSender) -> {
@@ -42,6 +44,14 @@ public class TrackerNetworking {
                 });
             }
         });
+
+        ClientPlayNetworking.registerGlobalReceiver(BEING_WATCHED_PACKET, (client, handler, buf, responseSender) -> {
+            boolean watched = buf.readBoolean();
+
+            client.execute(() -> {
+                isBeingWatched = watched;
+            });
+        });
     }
 
     public static void sendTrackerUpdate(ServerPlayerEntity trackedPlayer, ServerPlayerEntity trackingPlayer) {
@@ -66,12 +76,24 @@ public class TrackerNetworking {
         ServerPlayNetworking.send(trackingPlayer, TRACKER_UPDATE_PACKET, buf);
     }
 
+    public static void sendBeingWatchedUpdate(ServerPlayerEntity targetPlayer, boolean isWatched) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeBoolean(isWatched);
+
+        ServerPlayNetworking.send(targetPlayer, BEING_WATCHED_PACKET, buf);
+    }
+
     public static TrackedPlayerData getTrackedPosition(UUID uuid) {
         return trackedPositions.get(uuid);
     }
 
+    public static boolean isBeingWatched() {
+        return isBeingWatched;
+    }
+
     public static void clearCache() {
         trackedPositions.clear();
+        isBeingWatched = false;
     }
 
     public static class TrackedPlayerData {

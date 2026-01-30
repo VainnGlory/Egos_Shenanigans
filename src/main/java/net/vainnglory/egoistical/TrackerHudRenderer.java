@@ -83,7 +83,7 @@ public class TrackerHudRenderer implements HudRenderCallback {
                 }
             } else {
                 renderText(drawContext, client, "Tracking: " + trackedName, 0xF571AF);
-                renderText(drawContext, client, "Status: Offline", 0xF571AF, 10);
+                renderText(drawContext, client, "Status: Offline", 0xDEB983, 10);
             }
         }
     }

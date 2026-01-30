@@ -44,7 +44,7 @@ public class AdrenalineShotItem extends Item {
 
         if (!filled) {
             if (!world.isClient) {
-                user.sendMessage(Text.literal("The adrenaline shot is empty!").formatted(Formatting.GOLD), true);
+                user.sendMessage(Text.literal("The adrenaline shot is empty!").formatted(Formatting.RED), true);
             }
             return TypedActionResult.fail(stack);
         }
@@ -75,13 +75,8 @@ public class AdrenalineShotItem extends Item {
         if (entity instanceof ServerPlayerEntity target && user instanceof ServerPlayerEntity serverUser) {
             applyAdrenalineEffect(serverUser, target);
 
-            ItemStack heldStack = user.getStackInHand(hand);
-            heldStack.decrement(1);
-
             ItemStack emptyShot = new ItemStack(ModItems.ADRENALINE_SHOT_EMPTY);
-            if (!user.getInventory().insertStack(emptyShot)) {
-                user.dropItem(emptyShot, false);
-            }
+            user.setStackInHand(hand, emptyShot);
 
             serverUser.getInventory().markDirty();
             serverUser.playerScreenHandler.sendContentUpdates();
@@ -96,20 +91,18 @@ public class AdrenalineShotItem extends Item {
         AdrenalineManager.initializePlayer(target.getUuid());
 
         target.addStatusEffect(new StatusEffectInstance(ModEffects.ADRENALINE, 600, 0, false, true, true));
-
         target.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 600, 1, false, false, true));
-
         target.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 600, 0, false, false, true));
 
         target.getWorld().playSound(null, target.getX(), target.getY(), target.getZ(),
-                SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.0f, 1.0f);
+                SoundEvents.ITEM_BOTTLE_EMPTY, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
         if (target instanceof ServerPlayerEntity targetPlayer) {
             if (target.equals(user)) {
-                targetPlayer.sendMessage(Text.literal("Adrenaline rush activated!").formatted(Formatting.GOLD), true);
+                targetPlayer.sendMessage(Text.literal("Adrenaline rush activated!").formatted(Formatting.RED), true);
             } else {
-                targetPlayer.sendMessage(Text.literal(user.getName().getString() + " injected you with adrenaline!").formatted(Formatting.GOLD), true);
-                user.sendMessage(Text.literal("Injected " + targetPlayer.getName().getString() + " with adrenaline!").formatted(Formatting.GOLD), true);
+                targetPlayer.sendMessage(Text.literal(user.getName().getString() + " injected you with adrenaline!").formatted(Formatting.RED), true);
+                user.sendMessage(Text.literal("Injected " + targetPlayer.getName().getString() + " with adrenaline!").formatted(Formatting.RED), true);
             }
         }
     }

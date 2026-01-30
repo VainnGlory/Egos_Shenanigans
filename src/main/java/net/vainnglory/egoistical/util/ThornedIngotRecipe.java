@@ -59,7 +59,7 @@ public class ThornedIngotRecipe extends SpecialCraftingRecipe {
 
     @Override
     public ItemStack craft(RecipeInputInventory inventory, DynamicRegistryManager registryManager) {
-        return new ItemStack(ModItems.THORNED_INGOT);
+        return new ItemStack(ModItems.THORNED_INGOT, 8);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ThornedIngotRecipe extends SpecialCraftingRecipe {
 
     @Override
     public ItemStack getOutput(DynamicRegistryManager registryManager) {
-        return new ItemStack(ModItems.THORNED_INGOT);
+        return new ItemStack(ModItems.THORNED_INGOT, 8);
     }
 
     @Override

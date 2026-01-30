@@ -20,6 +20,7 @@ public class ModItemGroups {
                         entries.add(ModItems.ADRENALINE_SHOT_FILLED);
                         entries.add(ModItems.PORTABLE_STASIS);
                         entries.add(ModItems.THORNED_INGOT);
+                        entries.add(ModItems.TRICK_BAG);
 
                     }).build());
 

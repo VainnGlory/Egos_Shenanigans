@@ -1,0 +1,14 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "egoistical:item/trick_bag_empty"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "egoistical:filled": 1
+      },
+      "model": "egoistical:item/trick_bag_filled"
+    }
+  ]
+}

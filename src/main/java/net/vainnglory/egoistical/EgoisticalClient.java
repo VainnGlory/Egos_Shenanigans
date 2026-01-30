@@ -10,6 +10,7 @@ import net.vainnglory.egoistical.item.ModItems;
 import net.vainnglory.egoistical.item.PortableStasisItem;
 import net.vainnglory.egoistical.item.TrackerItem;
 import net.vainnglory.egoistical.network.TrackerNetworking;
+import net.vainnglory.egoistical.util.BeingWatchedHudRenderer;
 import net.vainnglory.egoistical.util.InventoryHelper;
 
 public class EgoisticalClient implements ClientModInitializer {
@@ -39,6 +40,7 @@ public class EgoisticalClient implements ClientModInitializer {
         });
 
         HudRenderCallback.EVENT.register(new TrackerHudRenderer());
+        HudRenderCallback.EVENT.register(new BeingWatchedHudRenderer());
     }
 
     public static boolean shouldCancelStepSound(PlayerEntity player) {

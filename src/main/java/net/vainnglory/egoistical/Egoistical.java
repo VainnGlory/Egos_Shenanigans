@@ -19,7 +19,9 @@ import net.vainnglory.egoistical.util.InventoryHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,6 +36,8 @@ public class Egoistical implements ModInitializer {
 
     private int thornedIngotTick = 0;
     private static final int THORNED_INGOT_DAMAGE_INTERVAL = 4;
+
+    private final Map<UUID, Set<UUID>> playersBeingWatched = new HashMap<>();
 
     @Override
     public void onInitialize() {
@@ -81,6 +85,10 @@ public class Egoistical implements ModInitializer {
                 }
 
                 handleAdrenalineEffectTracking(player);
+            }
+
+            if (shouldUpdateTrackers) {
+                updateBeingWatchedStatus(server);
             }
         });
 
@@ -148,12 +156,49 @@ public class Egoistical implements ModInitializer {
 
                     if (trackedPlayer != null) {
                         TrackerNetworking.sendTrackerUpdate(trackedPlayer, trackingPlayer);
+
+                        boolean sameDimension = trackingPlayer.getWorld().getRegistryKey().equals(
+                                trackedPlayer.getWorld().getRegistryKey());
+                        double distanceSquared = trackingPlayer.squaredDistanceTo(trackedPlayer);
+                        boolean withinRange = distanceSquared <= (35 * 35);
+
+                        if (sameDimension && withinRange) {
+                            playersBeingWatched
+                                    .computeIfAbsent(trackedUUID, k -> new HashSet<>())
+                                    .add(trackingPlayer.getUuid());
+                        } else {
+                            Set<UUID> watchers = playersBeingWatched.get(trackedUUID);
+                            if (watchers != null) {
+                                watchers.remove(trackingPlayer.getUuid());
+                            }
+                        }
                     } else {
                         TrackerNetworking.sendPlayerOffline(trackedUUID, trackingPlayer);
+
+                        Set<UUID> watchers = playersBeingWatched.get(trackedUUID);
+                        if (watchers != null) {
+                            watchers.remove(trackingPlayer.getUuid());
+                        }
                     }
                 }
             }
         }
+    }
+
+    private void updateBeingWatchedStatus(net.minecraft.server.MinecraftServer server) {
+        for (Set<UUID> watchers : playersBeingWatched.values()) {
+            watchers.removeIf(watcherUUID -> server.getPlayerManager().getPlayer(watcherUUID) == null);
+        }
+
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            UUID playerUUID = player.getUuid();
+            Set<UUID> watchers = playersBeingWatched.get(playerUUID);
+
+            boolean hasWatchers = watchers != null && !watchers.isEmpty();
+            TrackerNetworking.sendBeingWatchedUpdate(player, hasWatchers);
+        }
+
+        playersBeingWatched.entrySet().removeIf(entry -> entry.getValue().isEmpty());
     }
 
     private boolean hasGreedRune(ServerPlayerEntity player) {

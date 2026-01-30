@@ -7,12 +7,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.World;
 import net.vainnglory.egoistical.util.ModRarities;
 
 public class TrackerItem extends Item {
@@ -32,6 +34,24 @@ public class TrackerItem extends Item {
         return baseName.copy().setStyle(Style.EMPTY.withColor(rarity.color));
     }
 
+    @Override
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack stack = user.getStackInHand(hand);
+
+        if (!world.isClient && user.isSneaking() && hasTrackedPlayer(stack)) {
+            clearTrackedPlayer(stack);
+            user.sendMessage(Text.literal("Tracker cleared").formatted(Formatting.GOLD), true);
+
+            if (user instanceof ServerPlayerEntity serverPlayer) {
+                serverPlayer.getInventory().markDirty();
+                serverPlayer.playerScreenHandler.sendContentUpdates();
+            }
+
+            return TypedActionResult.success(stack);
+        }
+
+        return TypedActionResult.pass(stack);
+    }
 
     @Override
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
@@ -39,17 +59,14 @@ public class TrackerItem extends Item {
             return ActionResult.PASS;
         }
 
-        // Server-side logic
         if (entity instanceof PlayerEntity targetPlayer) {
-            ItemStack heldStack = user.getStackInHand(hand);
-
             if (user.isSneaking()) {
-                clearTrackedPlayer(heldStack);
-                user.sendMessage(Text.literal("Tracker cleared").formatted(Formatting.YELLOW), true);
-            } else {
-                setTrackedPlayer(heldStack, targetPlayer);
-                user.sendMessage(Text.literal("Now tracking: " + targetPlayer.getName().getString()).formatted(Formatting.GREEN), true);
+                return ActionResult.PASS;
             }
+
+            ItemStack heldStack = user.getStackInHand(hand);
+            setTrackedPlayer(heldStack, targetPlayer);
+            user.sendMessage(Text.literal("Now tracking: " + targetPlayer.getName().getString()).formatted(Formatting.GOLD), true);
 
             user.setStackInHand(hand, heldStack);
 

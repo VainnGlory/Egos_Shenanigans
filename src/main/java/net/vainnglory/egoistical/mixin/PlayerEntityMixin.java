@@ -14,9 +14,7 @@ public class PlayerEntityMixin {
     private void preventHealingInWater(CallbackInfoReturnable<Boolean> cir) {
         PlayerEntity player = (PlayerEntity) (Object) this;
 
-        // Check if player has the Greed Rune
         if (player.getInventory().contains(ModItems.GREED_RUNE.getDefaultStack())) {
-            // If player is in water, prevent natural healing from food
             if (player.isTouchingWater() || player.isSubmergedInWater()) {
                 cir.setReturnValue(false);
             }
