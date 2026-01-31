@@ -19,8 +19,10 @@ public class ModItemGroups {
                         entries.add(ModItems.ADRENALINE_SHOT_EMPTY);
                         entries.add(ModItems.ADRENALINE_SHOT_FILLED);
                         entries.add(ModItems.PORTABLE_STASIS);
+                        entries.add(ModItems.EMP);
                         entries.add(ModItems.THORNED_INGOT);
                         entries.add(ModItems.TRICK_BAG);
+                        entries.add(ModItems.MARKSMANS_PROOF);
 
                     }).build());
 

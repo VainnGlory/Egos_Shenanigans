@@ -16,5 +16,7 @@ public class EgoisticalEmiPlugin implements EmiPlugin {
         registry.removeEmiStacks(EmiStack.of(ModItems.PORTABLE_STASIS));
         registry.removeEmiStacks(EmiStack.of(ModItems.THORNED_INGOT));
         registry.removeEmiStacks(EmiStack.of(ModItems.TRICK_BAG));
+        registry.removeEmiStacks(EmiStack.of(ModItems.EMP));
+        registry.removeEmiStacks(EmiStack.of(ModItems.MARKSMANS_PROOF));
     }
 }

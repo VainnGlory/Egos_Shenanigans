@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " # ",
+    " S ",
+    " A "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:string"
+    },
+    "A": {
+      "item": "minecraft:leather"
+    },
+    "S": {
+      "item": "egoistical:thorned_ingot"
+    }
+  },
+  "result": {
+    "item": "egoistical:trick_bag"
+  }
+}

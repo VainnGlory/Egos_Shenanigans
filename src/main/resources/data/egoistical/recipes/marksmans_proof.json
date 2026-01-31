@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " # ",
+    " S ",
+    " A "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:netherite_scrap"
+    },
+    "A": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "S": {
+      "item": "egoistical:thorned_ingot"
+    }
+  },
+  "result": {
+    "item": "egoistical:marksmans_proof"
+  }
+}

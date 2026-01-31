@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": {
+    "item": "minecraft:redstone"
+  },
+  "base": {
+    "item": "egoistical:portable_stasis"
+  },
+  "result": {
+    "item": "egoistical:emp"
+  },
+  "template": {
+    "item": "egoistical:thorned_ingot"
+  }
+}

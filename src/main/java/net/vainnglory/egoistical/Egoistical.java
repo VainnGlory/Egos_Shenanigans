@@ -15,6 +15,7 @@ import net.vainnglory.egoistical.item.TrackerItem;
 import net.vainnglory.egoistical.network.TrackerNetworking;
 import net.vainnglory.egoistical.util.ModRecipes;
 import net.vainnglory.egoistical.util.AdrenalineManager;
+import net.vainnglory.egoistical.util.EMPManager;
 import net.vainnglory.egoistical.util.InventoryHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +70,9 @@ public class Egoistical implements ModInitializer {
                 shouldDamageThornedIngot = true;
             }
 
+
+            EMPManager.tick(server.getOverworld().getTime());
+
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 if (hasGreedRune(player)) {
                     handleGreedRuneEffects(player);
@@ -85,6 +89,13 @@ public class Egoistical implements ModInitializer {
                 }
 
                 handleAdrenalineEffectTracking(player);
+
+
+                if (EMPManager.needsRestoration(player.getUuid(), server.getOverworld().getTime())) {
+                    EMPManager.restoreEnchantments(player);
+                } else if (!EMPManager.isAffected(player.getUuid()) && server.getOverworld().getTime() % 20 == 0) {
+                    EMPManager.restoreAnyStoredEnchantments(player);
+                }
             }
 
             if (shouldUpdateTrackers) {
@@ -96,6 +107,7 @@ public class Egoistical implements ModInitializer {
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             UUID uuid = newPlayer.getUuid();
             AdrenalineManager.cleanup(uuid);
+            EMPManager.cleanup(uuid);
             playersWithAdrenaline.remove(uuid);
             LOGGER.info("Cleaned up adrenaline data for player: {}", newPlayer.getName().getString());
         });

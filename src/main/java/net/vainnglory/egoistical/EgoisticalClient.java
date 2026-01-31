@@ -9,6 +9,7 @@ import net.minecraft.util.Identifier;
 import net.vainnglory.egoistical.item.ModItems;
 import net.vainnglory.egoistical.item.PortableStasisItem;
 import net.vainnglory.egoistical.item.TrackerItem;
+import net.vainnglory.egoistical.item.TrickBagItem;
 import net.vainnglory.egoistical.network.TrackerNetworking;
 import net.vainnglory.egoistical.util.BeingWatchedHudRenderer;
 import net.vainnglory.egoistical.util.InventoryHelper;
@@ -30,6 +31,14 @@ public class EgoisticalClient implements ClientModInitializer {
                 new Identifier("egoistical", "charged"),
                 (stack, world, entity, seed) -> {
                     return PortableStasisItem.isFullyCharged(stack) ? 1.0f : 0.0f;
+                }
+        );
+
+        ModelPredicateProviderRegistry.register(
+                ModItems.TRICK_BAG,
+                new Identifier("egoistical", "filled"),
+                (stack, world, entity, seed) -> {
+                    return TrickBagItem.isFilled(stack) ? 1.0f : 0.0f;
                 }
         );
 

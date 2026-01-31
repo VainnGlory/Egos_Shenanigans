@@ -34,6 +34,12 @@ public class ModItems {
     public static final TrickBagItem TRICK_BAG = (TrickBagItem) registerItem("trick_bag",
             new TrickBagItem(new FabricItemSettings().maxCount(1), ModRarities.GOLDEN));
 
+    public static final MarksmanProofItem MARKSMANS_PROOF = (MarksmanProofItem) registerItem("marksmans_proof",
+            new MarksmanProofItem(new FabricItemSettings().maxCount(1), ModRarities.GOLDEN));
+
+    public static final EMPItem EMP = (EMPItem) registerItem("emp",
+            new EMPItem(new FabricItemSettings().maxCount(1), ModRarities.ENDER));
+
 
 
 
@@ -52,6 +58,8 @@ public class ModItems {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
             content.add(ADRENALINE_SHOT_EMPTY);
             content.add(ADRENALINE_SHOT_FILLED);
+            content.add(MARKSMANS_PROOF);
+            content.add(EMP);
         });
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(content -> {
             content.add(THORNED_INGOT);

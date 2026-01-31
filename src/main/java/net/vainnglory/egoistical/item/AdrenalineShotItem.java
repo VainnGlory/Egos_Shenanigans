@@ -99,10 +99,10 @@ public class AdrenalineShotItem extends Item {
 
         if (target instanceof ServerPlayerEntity targetPlayer) {
             if (target.equals(user)) {
-                targetPlayer.sendMessage(Text.literal("Adrenaline rush activated!").formatted(Formatting.RED), true);
+                targetPlayer.sendMessage(Text.literal("Adrenaline rush activated").formatted(Formatting.GOLD), true);
             } else {
-                targetPlayer.sendMessage(Text.literal(user.getName().getString() + " injected you with adrenaline!").formatted(Formatting.RED), true);
-                user.sendMessage(Text.literal("Injected " + targetPlayer.getName().getString() + " with adrenaline!").formatted(Formatting.RED), true);
+                targetPlayer.sendMessage(Text.literal(user.getName().getString() + " injected you with adrenaline").formatted(Formatting.GOLD), true);
+                user.sendMessage(Text.literal("Injected " + targetPlayer.getName().getString() + " with adrenaline").formatted(Formatting.GOLD), true);
             }
         }
     }
