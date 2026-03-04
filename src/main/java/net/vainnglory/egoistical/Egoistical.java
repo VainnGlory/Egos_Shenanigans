@@ -1,11 +1,12 @@
 package net.vainnglory.egoistical;
 
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.vainnglory.egoistical.util.HijackerChestScreenHandler;
 import net.vainnglory.egoistical.util.PendingVoidTeleport;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.vainnglory.egoistical.item.PortableStasisItem;
-import java.util.Map;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.vainnglory.egoistical.util.ForEgoOnlyManager;
 import net.vainnglory.egoistical.util.ModGameRules;
@@ -19,7 +20,10 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.vainnglory.egoistical.item.TrackerItem;
 import net.vainnglory.egoistical.network.TrackerNetworking;
 import net.vainnglory.egoistical.util.*;
@@ -30,8 +34,10 @@ import net.vainnglory.egoistical.util.HuskProjectileManager;
 import net.vainnglory.egoistical.enchantment.ModEnchantments;
 import net.vainnglory.egoistical.util.MetamorphosisManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -71,29 +77,49 @@ public class Egoistical implements ModInitializer {
 
         ModGameRules.registerGameRules();
 
+        ServerTickEvents.END_WORLD_TICK.register(world -> {
+            if (world.getTime() % 60 != 0) return;
+
+            String worldId = world.getRegistryKey().getValue().toString();
+            List<BlockPos> toRemove = new ArrayList<>();
+
+            for (Map.Entry<BlockPos, String> entry : BoundLodestoneCache.getAll().entrySet()) {
+                if (!entry.getValue().equals(worldId)) continue;
+                BlockPos pos = entry.getKey();
+
+                if (!world.getChunkManager().isChunkLoaded(pos.getX() >> 4, pos.getZ() >> 4)) {
+                    continue;
+                }
+
+                if (!world.getBlockState(pos).isOf(Blocks.LODESTONE)) {
+                    toRemove.add(pos);
+                    continue;
+                }
+
+                world.spawnParticles(ParticleTypes.SOUL_FIRE_FLAME,
+                        pos.getX() + 0.5,
+                        pos.getY() + 1.1,
+                        pos.getZ() + 0.5,
+                        1, 0.15, 0.0, 0.15, 0.01);
+            }
+
+            for (BlockPos pos : toRemove) {
+                UUID boundPlayer = BoundLodestoneCache.getPlayerForPos(pos);
+                BoundLodestoneCache.remove(pos);
+                if (boundPlayer != null && world.getServer() != null) {
+                    ServerPlayerEntity player = world.getServer().getPlayerManager().getPlayer(boundPlayer);
+                    if (player != null) {
+                        player.sendMessage(Text.literal("Your stasis lodestone was destroyed. Binding cleared.")
+                                .formatted(Formatting.RED), true);
+                    }
+                }
+            }
+        });
+
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             trackerUpdateTick++;
             thornedIngotTick++;
             PendingVoidTeleport.tick(server, server.getOverworld().getTime());
-
-            ServerTickEvents.END_WORLD_TICK.register(world -> {
-                if (world.getTime() % 60 != 0) return;
-
-                String worldId = world.getRegistryKey().getValue().toString();
-
-                for (Map.Entry<BlockPos, String> entry : net.vainnglory.egoistical.util.BoundLodestoneCache.getAll().entrySet()) {
-                    if (!entry.getValue().equals(worldId)) continue;
-                    BlockPos pos = entry.getKey();
-                    if (!world.getBlockState(pos).isOf(Blocks.LODESTONE)) continue;
-
-                    world.spawnParticles(ParticleTypes.SOUL_FIRE_FLAME,
-                            pos.getX() + 0.5,
-                            pos.getY() + 1.1,
-                            pos.getZ() + 0.5,
-                            1, 0.15, 0.0, 0.15, 0.01);
-                }
-            });
-
 
             boolean shouldUpdateTrackers = false;
             if (trackerUpdateTick >= TRACKER_UPDATE_INTERVAL) {
@@ -110,7 +136,6 @@ public class Egoistical implements ModInitializer {
             HuskProjectileManager.tick(server);
 
             MetamorphosisManager.tick(server.getOverworld().getTime(), server);
-
 
             EMPManager.tick(server.getOverworld().getTime());
 
@@ -131,7 +156,6 @@ public class Egoistical implements ModInitializer {
 
                 handleAdrenalineEffectTracking(player);
 
-
                 if (EMPManager.needsRestoration(player.getUuid(), server.getOverworld().getTime())) {
                     EMPManager.restoreEnchantments(player);
                 } else if (!EMPManager.isAffected(player.getUuid()) && server.getOverworld().getTime() % 20 == 0) {
@@ -144,7 +168,6 @@ public class Egoistical implements ModInitializer {
             }
         });
 
-
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             UUID uuid = newPlayer.getUuid();
             AdrenalineManager.cleanup(uuid);
@@ -152,6 +175,44 @@ public class Egoistical implements ModInitializer {
             playersWithAdrenaline.remove(uuid);
             HuskHealthManager.cleanupFull(newPlayer);
             LOGGER.info("Cleaned up adrenaline data for player: {}", newPlayer.getName().getString());
+
+            boolean hasBoundStasis = false;
+            for (int i = 0; i < newPlayer.getInventory().size(); i++) {
+                ItemStack stack = newPlayer.getInventory().getStack(i);
+                if (stack.getItem() instanceof PortableStasisItem && PortableStasisItem.hasBoundLodestone(stack)) {
+                    hasBoundStasis = true;
+                    break;
+                }
+            }
+            if (!hasBoundStasis) {
+                BoundLodestoneCache.removeByPlayer(uuid);
+            }
+        });
+
+        ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
+            if (!(entity instanceof ServerPlayerEntity victim)) return true;
+            if (victim.isCreative() || victim.isSpectator()) return true;
+            if (!(damageSource.getAttacker() instanceof ServerPlayerEntity attacker)) return true;
+            if (attacker == victim) return true;
+            if (attacker.isCreative() || attacker.isSpectator()) return true;
+
+            ItemStack offhand = attacker.getOffHandStack();
+            if (!offhand.isOf(ModItems.HIJACKER)) return true;
+
+            victim.setHealth(victim.getMaxHealth() / 2f);
+            victim.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 100, 10, false, false, true));
+            victim.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 100, 10, false, false, true));
+            victim.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 100, 0, false, false, true));
+
+            offhand.decrement(1);
+            attacker.getInventory().markDirty();
+
+            attacker.openHandledScreen(new SimpleNamedScreenHandlerFactory(
+                    (syncId, inv, player) -> new HijackerChestScreenHandler(syncId, inv, victim.getEnderChestInventory()),
+                    Text.literal(victim.getName().getString() + "'s Ender Chest")
+            ));
+
+            return false;
         });
 
         LOGGER.info("Egoistical Mod initialized successfully");
@@ -159,6 +220,20 @@ public class Egoistical implements ModInitializer {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             if (ForEgoOnlyManager.isActive(server)) {
                 ForEgoOnlyManager.stripRestrictedItems(handler.player);
+            }
+
+            ServerPlayerEntity joiningPlayer = handler.player;
+            UUID playerUUID = joiningPlayer.getUuid();
+            for (int i = 0; i < joiningPlayer.getInventory().size(); i++) {
+                ItemStack stack = joiningPlayer.getInventory().getStack(i);
+                if (stack.getItem() instanceof PortableStasisItem && PortableStasisItem.hasBoundLodestone(stack)) {
+                    BlockPos pos = PortableStasisItem.getBoundLodestonePos(stack);
+                    String dim = PortableStasisItem.getBoundLodestoneDimension(stack);
+                    if (pos != null && dim != null) {
+                        BoundLodestoneCache.add(pos, dim, playerUUID);
+                        break;
+                    }
+                }
             }
         });
 
@@ -297,6 +372,22 @@ public class Egoistical implements ModInitializer {
                 StatusEffectInstance hungerEffect = player.getStatusEffect(StatusEffects.HUNGER);
                 if (hungerEffect != null && hungerEffect.getAmplifier() == 1 && hungerEffect.getDuration() <= 60) {
                     player.removeStatusEffect(StatusEffects.HUNGER);
+                }
+            }
+        }
+
+        boolean isWet = player.isTouchingWater() || player.isSubmergedInWater() || player.getWorld().hasRain(player.getBlockPos());
+
+        if (isWet) {
+            StatusEffectInstance currentWither = player.getStatusEffect(StatusEffects.WITHER);
+            if (currentWither == null || currentWither.getDuration() < 20 || currentWither.getAmplifier() < 1) {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 60, 1, false, false, false));
+            }
+        } else {
+            if (player.hasStatusEffect(StatusEffects.WITHER)) {
+                StatusEffectInstance witherEffect = player.getStatusEffect(StatusEffects.WITHER);
+                if (witherEffect != null && witherEffect.getAmplifier() == 1 && witherEffect.getDuration() <= 60) {
+                    player.removeStatusEffect(StatusEffects.WITHER);
                 }
             }
         }

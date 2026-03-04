@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 public class PortableStasisItem extends Item {
     private static final String CHARGE_KEY = "StasisCharge";
@@ -66,7 +67,12 @@ public class PortableStasisItem extends Item {
 
         if (world.getBlockState(pos).isOf(Blocks.LODESTONE)) {
             if (!world.isClient) {
-                bindToLodestone(stack, pos, world);
+                if (BoundLodestoneCache.hasBinding(player.getUuid())) {
+                    player.sendMessage(Text.literal("You already have an active stasis! Break the lodestone or teleport to it first.")
+                            .formatted(Formatting.RED), true);
+                    return ActionResult.FAIL;
+                }
+                bindToLodestone(stack, pos, world, player.getUuid());
                 player.sendMessage(Text.literal("Stasis bound to lodestone at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ())
                         .formatted(Formatting.GOLD), true);
                 world.playSound(null, pos, SoundEvents.ITEM_LODESTONE_COMPASS_LOCK, SoundCategory.PLAYERS, 1.0f, 1.0f);
@@ -208,14 +214,14 @@ public class PortableStasisItem extends Item {
         return getCharge(stack) >= MAX_CHARGE;
     }
 
-    private void bindToLodestone(ItemStack stack, BlockPos pos, World world) {
+    private void bindToLodestone(ItemStack stack, BlockPos pos, World world, UUID playerUUID) {
         NbtCompound nbt = stack.getOrCreateNbt();
         nbt.putInt(LODESTONE_POS_KEY + "X", pos.getX());
         nbt.putInt(LODESTONE_POS_KEY + "Y", pos.getY());
         nbt.putInt(LODESTONE_POS_KEY + "Z", pos.getZ());
         nbt.putString(LODESTONE_DIMENSION_KEY, world.getRegistryKey().getValue().toString());
 
-        BoundLodestoneCache.add(pos, world.getRegistryKey().getValue().toString());
+        BoundLodestoneCache.add(pos, world.getRegistryKey().getValue().toString(), playerUUID);
     }
 
     private void clearBinding(ItemStack stack) {
@@ -237,7 +243,7 @@ public class PortableStasisItem extends Item {
     }
 
     @Nullable
-    private BlockPos getBoundLodestonePos(ItemStack stack) {
+    public static BlockPos getBoundLodestonePos(ItemStack stack) {
         NbtCompound nbt = stack.getNbt();
         if (nbt != null && nbt.contains(LODESTONE_POS_KEY + "X")) {
             return new BlockPos(
@@ -250,7 +256,7 @@ public class PortableStasisItem extends Item {
     }
 
     @Nullable
-    private String getBoundLodestoneDimension(ItemStack stack) {
+    public static String getBoundLodestoneDimension(ItemStack stack) {
         NbtCompound nbt = stack.getNbt();
         if (nbt != null && nbt.contains(LODESTONE_DIMENSION_KEY)) {
             return nbt.getString(LODESTONE_DIMENSION_KEY);
@@ -295,4 +301,5 @@ public class PortableStasisItem extends Item {
         return false;
     }
 }
+
 

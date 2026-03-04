@@ -1,7 +1,6 @@
 package net.vainnglory.egoistical.item;
 
 import net.minecraft.item.MusicDiscItem;
-import net.minecraft.item.PotionItem;
 import net.vainnglory.egoistical.Egoistical;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -13,7 +12,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.vainnglory.egoistical.util.ModRarities;
 import net.vainnglory.egoistical.util.ModSounds;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 
 public class ModItems {
     public static final Item GREED_RUNE = registerItem("greed_rune",
@@ -26,7 +24,7 @@ public class ModItems {
             new AdrenalineShotItem(new FabricItemSettings().maxCount(16), ModRarities.GOLDEN, false));
 
     public static final AdrenalineShotItem ADRENALINE_SHOT_FILLED = (AdrenalineShotItem) registerItem("adrenaline_shot_filled",
-            new AdrenalineShotItem (new FabricItemSettings().maxCount(1), ModRarities.GOLDEN, true));
+            new AdrenalineShotItem(new FabricItemSettings().maxCount(1), ModRarities.GOLDEN, true));
 
     public static final PortableStasisItem PORTABLE_STASIS = (PortableStasisItem) registerItem("portable_stasis",
             new PortableStasisItem(new FabricItemSettings().maxCount(1), ModRarities.ENDER));
@@ -49,6 +47,9 @@ public class ModItems {
     public static final HuskOfAllTradesItem HUSK_OF_ALL_TRADES = (HuskOfAllTradesItem) registerItem("husk_of_all_trades",
             new HuskOfAllTradesItem(new FabricItemSettings().maxCount(1), ModRarities.GOLDEN));
 
+    public static final HijackerItem HIJACKER = (HijackerItem) registerItem("hijacker",
+            new HijackerItem(new FabricItemSettings().maxCount(1), ModRarities.GOLDEN));
+
 
     private static Item registerItem(String name, Item item) {
         return Registry.register(Registries.ITEM, new Identifier(Egoistical.MOD_ID, name), item);
@@ -68,9 +69,11 @@ public class ModItems {
             content.add(MARKSMANS_PROOF);
             content.add(EMP);
             content.add(HUSK_OF_ALL_TRADES);
+            content.add(HIJACKER);
         });
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(content -> {
             content.add(THORNED_INGOT);
         });
     }
 }
+
